@@ -33,7 +33,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="initialView" destination="VFu-om-1Yj" id="B02-vo-uJ0"/>
+                        <outlet property="mainView" destination="VFu-om-1Yj" id="B02-vo-uJ0"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

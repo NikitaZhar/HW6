@@ -7,30 +7,36 @@
 
 import UIKit
 
+protocol SettingsViewControllerDeledate {
+    func setNewColor(with newColor: UIColor)
+}
+
 class ColorizerViewController: UIViewController {
     
-    var redComponent: CGFloat = 0
-    var greenComponent: CGFloat = 0
-    var blueComponent: CGFloat = 0
-    var alphaComponent: CGFloat = 1
-    
-    var selectedColor = UIColor(
-        red: CGFloat(0),
+    var mainScreenColor = UIColor(
+        red: CGFloat(0.5),
         green: CGFloat(0.5),
-        blue: CGFloat(0),
+        blue: CGFloat(0.5),
         alpha: 1.0)
     
-    @IBOutlet var initialView: UIView!
+    @IBOutlet var mainView: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        initialView.backgroundColor = selectedColor
+        mainView.backgroundColor = mainScreenColor
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard let settingsVC = segue.destination as? SettingsViewController else { return }
-        settingsVC.initialViewColor = selectedColor
+        settingsVC.mainScreenColor = mainScreenColor
+        settingsVC.delegate = self
     }
 }
 
+extension ColorizerViewController: SettingsViewControllerDeledate {
+    func setNewColor(with newColor: UIColor) {
+        mainScreenColor = newColor
+        mainView.backgroundColor = newColor
+    }
+}
