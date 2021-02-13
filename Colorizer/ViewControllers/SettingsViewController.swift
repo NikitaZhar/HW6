@@ -18,6 +18,10 @@ class SettingsViewController: UIViewController {
     @IBOutlet var greenSlider: UISlider!
     @IBOutlet var blueSlider: UISlider!
     
+    @IBOutlet var redTF: UITextField!
+    @IBOutlet var greenTF: UITextField!
+    @IBOutlet var blueTF: UITextField!
+    
     var mainScreenColor: UIColor!
     var newColor: UIColor!
     var delegate: SettingsViewControllerDeledate!
@@ -25,34 +29,38 @@ class SettingsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        
+        redTF.delegate = self
+        greenTF.delegate = self
+        blueTF.delegate = self
+        
         coloredView.layer.cornerRadius = 10
         navigationItem.hidesBackButton = true
-        updateElements() 
+        updateElements()
     }
     
     @IBAction func rgbSliderAction(_ sender: UISlider) {
         switch sender.tag {
         case 1: redLabel.text = setColorLabel(for: sender)
+            redTF.text = redLabel.text
         case 2: greenLabel.text = setColorLabel(for: sender)
+            greenTF.text = greenLabel.text
         case 3: blueLabel.text = setColorLabel(for: sender)
+            blueTF.text = blueLabel.text
         default: break
         }
-        settingColor()
+        setNewColour()
     }
     
     @IBAction func doneButtonPressed() {
+        view.endEditing(true)
+        setNewColour()
         delegate.setNewColor(with: newColor)
         dismiss(animated: true)
     }
     
 //MARK: - Setting color
-    private func settingColor() {
-        newColor = UIColor(
-            red: CGFloat(redSlider.value),
-            green: CGFloat(greenSlider.value),
-            blue: CGFloat(blueSlider.value),
-            alpha: 1.0
-        )
+    private func settingViewColor() {
         coloredView.backgroundColor = newColor
     }
     
@@ -65,11 +73,25 @@ class SettingsViewController: UIViewController {
         greenSlider.setValue(green, animated: true)
         blueSlider.setValue(blue, animated: true)
         
-        redLabel.text = String(red)
-        greenLabel.text = String(green)
-        blueLabel.text = String(blue)
+        redLabel.text = String(format: "%.2f", red)
+        greenLabel.text = String(format: "%.2f", green)
+        blueLabel.text = String(format: "%.2f", blue)
         
-        settingColor()
+        redTF.text = String(format: "%.2f", red)
+        greenTF.text = String(format: "%.2f", green)
+        blueTF.text = String(format: "%.2f", blue)
+        
+        setNewColour()
+    }
+    
+    private func setNewColour() {
+        newColor = UIColor(
+            red: CGFloat(redSlider.value),
+            green: CGFloat(greenSlider.value),
+            blue: CGFloat(blueSlider.value),
+            alpha: 1.0
+        )
+        coloredView.backgroundColor = newColor
     }
     
     private func setColorLabel (for slider: UISlider) -> String {
@@ -88,3 +110,34 @@ extension UIColor {
         return (redComponent, greenComponent, blueComponent, alpha)
     }
 }
+
+extension SettingsViewController: UITextFieldDelegate {
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        guard let newValue = textField.text else { return }
+        guard let numberValue = Float(newValue) else { return }
+        
+        switch textField.tag {
+        case 1: redSlider.setValue(numberValue, animated: true)
+            redLabel.text = String(format: "%.2f", numberValue)
+        case 2: greenSlider.setValue(numberValue, animated: true)
+            greenLabel.text = String(format: "%.2f", numberValue)
+        case 3: blueSlider.setValue(numberValue, animated: true)
+            blueLabel.text = String(format: "%.2f", numberValue)
+        default: break
+        }
+        setNewColour()
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super .touchesBegan(touches, with: event)
+        view.endEditing(true)
+    }
+
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        doneButtonPressed()
+        return true
+    }
+
+}
+
+
